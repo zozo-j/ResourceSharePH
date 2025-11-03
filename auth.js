@@ -180,15 +180,54 @@ class AuthSystem {
             DateRegistered: new Date().toLocaleDateString()
         };
         
+        // Try to persist to server endpoint first (if available). If server is unreachable, fall back to localStorage + CSV download.
+        try {
+            const resp = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, fullName, role, barangay, phone })
+            });
+
+            if (resp.ok) {
+                const data = await resp.json();
+                const savedUser = data.user || newUser;
+
+                // Update in-memory users and localStorage
+                this.users.push(savedUser);
+                const savedUsers = localStorage.getItem('registeredUsers');
+                const registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
+                registeredUsers.push(savedUser);
+                localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+
+                // Add to appData.users for CSV export (sanitized)
+                if (typeof appData !== 'undefined') {
+                    appData.users.push({
+                        id: savedUser.ID,
+                        username: savedUser.Username,
+                        fullName: savedUser.FullName,
+                        role: savedUser.Role,
+                        barangay: savedUser.Barangay,
+                        phone: savedUser.Phone,
+                        dateRegistered: savedUser.DateRegistered
+                    });
+                }
+
+                if (typeof renderUsers === 'function') renderUsers();
+
+                return { success: true, message: 'Registration successful' };
+            }
+        } catch (err) {
+            // Server not available or failed — fall back to client-side storage and CSV download
+            console.warn('Server registration failed, falling back to local storage:', err);
+        }
+
+        // Fallback: persist in localStorage and provide sanitized CSV download
         this.users.push(newUser);
-        
-        // Save to localStorage
         const savedUsers = localStorage.getItem('registeredUsers');
         const registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
         registeredUsers.push(newUser);
         localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-        
-        // Add to appData.users for CSV export
+
         if (typeof appData !== 'undefined') {
             appData.users.push({
                 id: newUser.ID,
@@ -200,16 +239,11 @@ class AuthSystem {
                 dateRegistered: newUser.DateRegistered
             });
         }
-        
-        // Refresh Users table if visible
-        if (typeof renderUsers === 'function') {
-            renderUsers();
-        }
-        
-        // Add to Users.csv (download updated file)
+
+        if (typeof renderUsers === 'function') renderUsers();
+
         this.appendToUsersCSV(newUser);
-        
-        return { success: true, message: 'Registration successful' };
+        return { success: true, message: 'Registration successful (local)' };
     }
 
     // Append new user to Users.csv
