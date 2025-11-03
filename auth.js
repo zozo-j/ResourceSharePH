@@ -16,24 +16,44 @@ class AuthSystem {
 
     // Load users (hardcoded + localStorage)
     async loadUsers() {
-        const defaultUsers = [
-            {
-                ID: '1',
-                Username: 'zozo-jessejane',
-                PasswordHash: '8bf2182fb4d557532d4fcd97284e186875d92dbe3116e521b6d8742e122951a8',
-                Role: 'admin',
-                FullName: 'Jesse Jane Zozo',
-                Barangay: 'Barangay Cogon',
-                Phone: '09171234567',
-                PhoneVerified: true,
-                DateRegistered: '2024-01-18'
+        try {
+            // Try to load users from the CSV assets via the CSVDatabase (if available)
+            let csvUsers = [];
+            if (typeof db !== 'undefined' && typeof db.loadTable === 'function') {
+                const rows = await db.loadTable('users');
+                csvUsers = rows.map(r => ({
+                    ID: r.ID || r.Id || r.id || '',
+                    Username: r.Username || r.username || '',
+                    PasswordHash: r.PasswordHash || r.PasswordHash || '',
+                    Role: r.Role || r.role || 'user',
+                    FullName: r.FullName || r['Full Name'] || r.fullName || '',
+                    Barangay: r.Barangay || r.barangay || '',
+                    Phone: r.Phone || r.phone || '',
+                    PhoneVerified: r.PhoneVerified === 'true' || r.PhoneVerified === true || false,
+                    DateRegistered: r.DateRegistered || r['Date Registered'] || ''
+                }));
             }
-        ];
-        
-        const savedUsers = localStorage.getItem('registeredUsers');
-        const registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
-        
-        this.users = [...defaultUsers, ...registeredUsers];
+
+            const savedUsers = localStorage.getItem('registeredUsers');
+            const registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
+
+            // Merge CSV users and registeredUsers, avoiding duplicate usernames (registeredUsers take precedence)
+            const usersByUsername = {};
+            csvUsers.forEach(u => {
+                if (u.Username) usersByUsername[u.Username] = u;
+            });
+            registeredUsers.forEach(u => {
+                if (u.Username) usersByUsername[u.Username] = u;
+            });
+
+            this.users = Object.values(usersByUsername);
+        } catch (err) {
+            // Fallback: load from localStorage only
+            const savedUsers = localStorage.getItem('registeredUsers');
+            const registeredUsers = savedUsers ? JSON.parse(savedUsers) : [];
+            this.users = [...registeredUsers];
+            console.error('Error loading users from CSV, falling back to localStorage:', err);
+        }
     }
 
     // Login function
