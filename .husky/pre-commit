@@ -1,0 +1,8 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Minify JS files before commit and add the generated files to the commit
+npm run minify
+
+# Add generated minified files so commits include the updated artifacts
+git add auth.min.js database.min.js script.min.js || true

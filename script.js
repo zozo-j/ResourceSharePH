@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadDataFromCSV();
 });
 
-// Tab functionality
+// Tab functionality test pre-hook minify
 function initTabs() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
