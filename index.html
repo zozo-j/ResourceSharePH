@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResourceShare PH - Community Resource Sharing</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🇵🇭 ResourceShare PH</h1>
+            <p>Bayanihan Spirit in Action</p>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="share">Share Resources</button>
+            <button class="tab-btn" data-tab="request">Request Help</button>
+            <button class="tab-btn" data-tab="kitchen">Community Kitchen</button>
+            <button class="tab-btn" data-tab="transport">Transportation</button>
+            <button class="tab-btn admin-only" data-tab="users" style="display: none;">Users</button>
+        </nav>
+
+        <!-- Share Resources -->
+        <div id="share" class="tab-content active">
+            <h2>🤝 Share Your Resources</h2>
+            <div class="resource-form">
+                <input type="text" id="resource-name" placeholder="Resource name (e.g., Generator, Water)">
+                <select id="resource-category">
+                    <option value="">Select Category</option>
+                    <option value="power">Power & Electricity</option>
+                    <option value="water">Water & Food</option>
+                    <option value="shelter">Shelter & Supplies</option>
+                    <option value="medical">Medical Supplies</option>
+                    <option value="tools">Tools & Equipment</option>
+                </select>
+                <input type="text" id="resource-location" placeholder="Your barangay/location">
+                <input type="tel" id="resource-contact" placeholder="Contact number">
+                <textarea id="resource-notes" placeholder="Additional notes (availability, conditions)"></textarea>
+                <button onclick="shareResource()">Share Resource</button>
+            </div>
+            <div class="shared-resources">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Available Resources</h3>
+                    <button onclick="exportToCSV('resources')" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; display: none;" class="admin-only">Export CSV</button>
+                </div>
+                <div id="available-resources"></div>
+            </div>
+        </div>
+
+        <!-- Request Help -->
+        <div id="request" class="tab-content">
+            <h2>🆘 Request Community Help</h2>
+            <div class="request-form">
+                <input type="text" id="request-need" placeholder="What do you need?">
+                <select id="request-urgency">
+                    <option value="">Urgency Level</option>
+                    <option value="critical">Critical - Life threatening</option>
+                    <option value="urgent">Urgent - Within 24 hours</option>
+                    <option value="moderate">Moderate - Within 3 days</option>
+                    <option value="low">Low - When available</option>
+                </select>
+                <input type="text" id="request-location" placeholder="Your location">
+                <input type="tel" id="request-contact" placeholder="Contact number">
+                <textarea id="request-details" placeholder="Describe your situation"></textarea>
+                <button onclick="submitRequest()">Submit Request</button>
+            </div>
+            <div class="help-requests">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Community Requests</h3>
+                    <button onclick="exportToCSV('requests')" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; display: none;" class="admin-only">Export CSV</button>
+                </div>
+                <div id="help-requests"></div>
+            </div>
+        </div>
+
+        <!-- Community Kitchen -->
+        <div id="kitchen" class="tab-content">
+            <h2>🍲 Community Kitchen Coordination</h2>
+            <div class="kitchen-form">
+                <input type="text" id="kitchen-location" placeholder="Kitchen location">
+                <input type="date" id="kitchen-date">
+                <input type="time" id="kitchen-time">
+                <input type="number" id="kitchen-capacity" placeholder="How many people can you feed?">
+                <textarea id="kitchen-menu" placeholder="Menu or food type"></textarea>
+                <button onclick="registerKitchen()">Register Kitchen</button>
+            </div>
+            <div class="active-kitchens">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Active Community Kitchens</h3>
+                    <button onclick="exportToCSV('kitchens')" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; display: none;" class="admin-only">Export CSV</button>
+                </div>
+                <div id="community-kitchens"></div>
+            </div>
+        </div>
+
+        <!-- Transportation -->
+        <div id="transport" class="tab-content">
+            <h2>🚗 Transportation Pooling</h2>
+            <div class="transport-form">
+                <select id="transport-type">
+                    <option value="">Transportation Type</option>
+                    <option value="evacuation">Evacuation Transport</option>
+                    <option value="supplies">Supply Delivery</option>
+                    <option value="medical">Medical Emergency</option>
+                    <option value="general">General Transport</option>
+                </select>
+                <input type="text" id="transport-from" placeholder="From (location)">
+                <input type="text" id="transport-to" placeholder="To (destination)">
+                <input type="datetime-local" id="transport-when">
+                <input type="number" id="transport-seats" placeholder="Available seats">
+                <input type="tel" id="transport-contact" placeholder="Driver contact">
+                <button onclick="offerTransport()">Offer Transport</button>
+            </div>
+            <div class="transport-offers">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3>Available Transportation</h3>
+                    <button onclick="exportToCSV('transport')" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; display: none;" class="admin-only">Export CSV</button>
+                </div>
+                <div id="transport-list"></div>
+            </div>
+        </div>
+
+        <!-- Users Management (Admin Only) -->
+        <div id="users" class="tab-content">
+            <h2>👥 Users Management</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Registered Users</h3>
+                <div>
+                    <button onclick="exportToCSV('users')" style="background: #28a745; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; margin-right: 10px;" class="admin-only">Export CSV</button>
+                    <button onclick="exportToExcel('users')" style="background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer;" class="admin-only">Export Excel</button>
+                </div>
+            </div>
+            <div class="users-list">
+                <div id="users-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="auth.min.js"></script>
+    <script src="database.min.js"></script>
+    <script src="script.min.js"></script>
+</body>
+</html>

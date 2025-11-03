@@ -1,0 +1,5 @@
+ID,Username,PasswordHash,Role,FullName,Barangay,DateRegistered
+1,admin,5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8,admin,System Administrator,Barangay Hall,2024-01-15
+2,captain_jose,ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f,captain,Jose Santos,Barangay San Jose,2024-01-16
+3,volunteer_maria,2c6ee24b09816a6f14f95d1698b24ead,volunteer,Maria Cruz,Barangay Poblacion,2024-01-17
+4,zozo-jessejane,8bf2182fb4d557532d4fcd97284e186875d92dbe3116e521b6d8742e122951a8,admin,Jesse Jane Zozo,Barangay Central,2024-01-18
