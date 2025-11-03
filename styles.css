@@ -18,15 +18,54 @@ body {
 }
 
 header {
-    text-align: center;
     color: white;
-    margin-bottom: 30px;
+    margin-bottom: 5px;
+}
+
+/* Topbar inside header: logo at left, profile area at right */
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+.site-logo {
+    width: 56px;
+    height: auto;
+}
+
+.profile-area {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
 }
 
 header h1 {
     font-size: 2.5rem;
     margin-bottom: 10px;
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Mobile logo: hidden by default, shown on small screens */
+.site-title {
+    text-align: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.site-tagline {
+    text-align: center;
+    margin-top: 6px;
+    color: white;
+    margin-bottom: 20px;
+}
+
+/* Standardize section headings */
+h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
 }
 
 .tabs {
@@ -36,6 +75,15 @@ header h1 {
     margin-bottom: 20px;
     overflow: hidden;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.tab-select {
+    display: none;
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
 }
 
 .tab-btn {
@@ -362,7 +410,7 @@ header h1 {
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .container {
         padding: 10px;
     }
@@ -388,5 +436,20 @@ header h1 {
     .dropdown-content {
         min-width: 280px;
         right: -10px;
+    }
+    .site-logo {
+        width: 64px;
+    }
+
+    /* Hide tab buttons on small screens and show a dropdown instead.
+       Keep the .tabs container visible so the select (inside it) can be shown. */
+    .tabs {
+        display: block;
+    }
+    .tab-btn {
+        display: none;
+    }
+    .tab-select {
+        display: block;
     }
 }

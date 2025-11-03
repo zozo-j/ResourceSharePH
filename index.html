@@ -9,11 +9,17 @@
 <body>
     <div class="container">
         <header>
-            <h1>🇵🇭 ResourceShare PH</h1>
-            <p>Bayanihan Spirit in Action</p>
+            <div class="topbar">
+                <img src="assets/logo.png" id="site-logo" class="site-logo" alt="ResourceShare PH logo" />
+                <div id="profile-area" class="profile-area"><!-- profile dropdown injected here --></div>
+            </div>
         </header>
-
+            <h1 class="site-title">🇵🇭 ResourceShare PH</h1>
+            <p class="site-tagline">Bayanihan Spirit in Action</p>
         <nav class="tabs">
+            <select id="tab-select" class="tab-select" aria-label="Select section">
+                <!-- options populated by JS for parity with tabs -->
+            </select>
             <button class="tab-btn active" data-tab="share">Share Resources</button>
             <button class="tab-btn" data-tab="request">Request Help</button>
             <button class="tab-btn" data-tab="kitchen">Community Kitchen</button>

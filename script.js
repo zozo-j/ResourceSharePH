@@ -22,18 +22,80 @@ document.addEventListener('DOMContentLoaded', function() {
 function initTabs() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const tabContents = document.querySelectorAll('.tab-content');
+    const tabSelect = document.getElementById('tab-select');
+
+    function activateTab(target) {
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+
+        const btn = Array.from(tabBtns).find(b => b.dataset.tab === target);
+        if (btn) btn.classList.add('active');
+
+        const content = document.getElementById(target);
+        if (content) {
+            // remove inline styles from other contents
+            document.querySelectorAll('.tab-content').forEach(tc => {
+                tc.style.transition = '';
+                tc.style.opacity = '';
+                tc.style.transform = '';
+            });
+
+            // Activate and animate the target content (fade + slide)
+            content.classList.add('active');
+            content.style.opacity = 0;
+            content.style.transform = 'translateY(8px)';
+            // force reflow then animate
+            requestAnimationFrame(() => {
+                content.style.transition = 'opacity 240ms ease, transform 240ms ease';
+                content.style.opacity = 1;
+                content.style.transform = 'translateY(0)';
+            });
+        }
+
+        if (tabSelect) tabSelect.value = target;
+    }
 
     tabBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const target = btn.dataset.tab;
-            
-            tabBtns.forEach(b => b.classList.remove('active'));
-            tabContents.forEach(c => c.classList.remove('active'));
-            
-            btn.classList.add('active');
-            document.getElementById(target).classList.add('active');
+            activateTab(btn.dataset.tab);
         });
     });
+
+    if (tabSelect) {
+        // populate select options based on existing tab buttons (keeps labels in sync)
+        // use small emoji icons in the label; hide admin-only option unless current user is admin
+        const iconMap = {
+            share: '🤝',
+            request: '🆘',
+            kitchen: '🍲',
+            transport: '🚗',
+            users: '👥'
+        };
+
+        // determine whether current user is admin
+        const isAdmin = (typeof auth !== 'undefined' && auth.isLoggedIn() && auth.getCurrentUser() && auth.getCurrentUser().role === 'admin');
+
+        if (tabSelect.options.length === 0) {
+            tabBtns.forEach(b => {
+                const isAdminOnly = b.classList.contains('admin-only');
+                if (isAdminOnly && !isAdmin) return; // skip admin-only tabs for non-admins
+
+                const opt = document.createElement('option');
+                opt.value = b.dataset.tab;
+                const icon = iconMap[b.dataset.tab] || '';
+                opt.textContent = `${icon} ${b.textContent.trim()}`;
+                tabSelect.appendChild(opt);
+            });
+        }
+
+        tabSelect.addEventListener('change', () => {
+            activateTab(tabSelect.value);
+        });
+    }
+
+    // Ensure an active tab is set on init
+    const activeBtn = document.querySelector('.tab-btn.active') || tabBtns[0];
+    if (activeBtn) activateTab(activeBtn.dataset.tab);
 }
 
 // Share Resource

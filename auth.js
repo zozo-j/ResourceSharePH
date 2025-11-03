@@ -338,13 +338,13 @@ async function handleRegister() {
 
 
 
-// Add logout button to main app
+// Add logout/profile dropdown to main app (injects into #profile-area if present)
 function addLogoutButton() {
     const header = document.querySelector('header');
     if (header && auth.isLoggedIn()) {
         const user = auth.getCurrentUser();
-        header.innerHTML += `
-            <div class="profile-dropdown" style="position: absolute; top: 20px; right: 20px;">
+        const profileHtml = `
+            <div class="profile-dropdown">
                 <button class="profile-icon" onclick="toggleProfileDropdown()">👤</button>
                 <div class="dropdown-content" id="profileDropdown">
                     <div style="text-align: center; margin-bottom: 15px; color: #333; padding-bottom: 15px; border-bottom: 1px solid #eee;">
@@ -377,6 +377,13 @@ function addLogoutButton() {
             </div>
         `;
 
+        const profileArea = document.getElementById('profile-area');
+        if (profileArea) {
+            profileArea.innerHTML = profileHtml;
+        } else {
+            // Fallback: append to header
+            header.innerHTML += profileHtml;
+        }
     }
 }
 
