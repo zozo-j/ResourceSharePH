@@ -14,7 +14,20 @@ class CSVDatabase {
     // Load CSV data
     async loadTable(tableName) {
         try {
-            const response = await fetch(this.baseUrl + this.tables[tableName]);
+            // Prefer files in the hidden .records folder if present (e.g. ./assets/.records/ShareResources.csv)
+            const recordPath = this.baseUrl + '.records/' + this.tables[tableName];
+            let response = await fetch(recordPath);
+
+            if (!response.ok) {
+                // Fallback to the standard assets path
+                response = await fetch(this.baseUrl + this.tables[tableName]);
+            }
+
+            if (!response.ok) {
+                console.error(`Failed to load ${tableName} from both .records and assets:`, response.status);
+                return [];
+            }
+
             const csvText = await response.text();
             return this.parseCSV(csvText);
         } catch (error) {

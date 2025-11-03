@@ -6,7 +6,12 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);
+    /* Background image (no gradient overlay) */
+    background-image: url('assets/ph-bg.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
     min-height: 100vh;
     color: #333;
 }
@@ -104,14 +109,26 @@ h2 {
 
 .tab-content {
     display: none;
-    background: white;
+    /* make content slightly translucent so the page background image shows through */
+    background: rgba(255,255,255,0.1);
     border-radius: 10px;
     padding: 30px;
     box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    /* subtle border and backdrop blur for readability */
+    border: 1px solid rgba(255,255,255,0.6);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+    /* default hidden state for animation (use classes to show) */
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 240ms ease, transform 240ms ease;
 }
 
 .tab-content.active {
     display: block;
+    /* when active, CSS transitions bring opacity up and slide into place */
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .resource-form, .request-form, .kitchen-form, .transport-form {

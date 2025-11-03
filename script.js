@@ -33,23 +33,15 @@ function initTabs() {
 
         const content = document.getElementById(target);
         if (content) {
-            // remove inline styles from other contents
+            // remove any inline styles from other contents (keep CSS-driven animation)
             document.querySelectorAll('.tab-content').forEach(tc => {
                 tc.style.transition = '';
                 tc.style.opacity = '';
                 tc.style.transform = '';
             });
 
-            // Activate and animate the target content (fade + slide)
+            // Activate the target content — CSS will handle opacity/transform transitions
             content.classList.add('active');
-            content.style.opacity = 0;
-            content.style.transform = 'translateY(8px)';
-            // force reflow then animate
-            requestAnimationFrame(() => {
-                content.style.transition = 'opacity 240ms ease, transform 240ms ease';
-                content.style.opacity = 1;
-                content.style.transform = 'translateY(0)';
-            });
         }
 
         if (tabSelect) tabSelect.value = target;

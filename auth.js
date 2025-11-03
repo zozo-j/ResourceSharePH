@@ -60,15 +60,9 @@ class AuthSystem {
     async login(username, password) {
         await this.loadUsers();
         const hashedPassword = await this.hashPassword(password);
-        
-        console.log('Login attempt:', username);
-        console.log('Generated hash:', hashedPassword);
-        console.log('Users loaded:', this.users.length);
-        
-        const user = this.users.find(u => {
-            console.log('Checking user:', u.Username, 'Hash:', u.PasswordHash);
-            return u.Username === username && u.PasswordHash === hashedPassword;
-        });
+
+        // Do not log sensitive information (password hashes). Keep login attempts silent.
+        const user = this.users.find(u => u.Username === username && u.PasswordHash === hashedPassword);
 
         if (user) {
 
@@ -224,23 +218,47 @@ class AuthSystem {
             // Read current Users.csv
             const response = await fetch('./assets/Users.csv');
             const csvContent = await response.text();
-            
-            // Append new user row
-            const newRow = `\n${newUser.ID},${newUser.Username},${newUser.PasswordHash},${newUser.Role},${newUser.FullName},${newUser.Barangay},${newUser.DateRegistered}`;
-            const updatedCSV = csvContent + newRow;
-            
-            // Download updated CSV file
+
+            // Build a sanitized CSV that excludes any password/hash column
+            const lines = csvContent.split(/\r?\n/);
+            let sanitized = '';
+
+            if (lines.length > 0) {
+                const header = lines[0].split(',');
+                const pwIndex = header.findIndex(h => /password/i.test(h));
+
+                // Create header without password column
+                const sanitizedHeader = header.filter((_, idx) => idx !== pwIndex);
+                const sanitizedRows = [];
+
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+                    const cols = lines[i].split(',');
+                    const filtered = cols.filter((_, idx) => idx !== pwIndex);
+                    sanitizedRows.push(filtered.join(','));
+                }
+
+                sanitized = [sanitizedHeader.join(',')].concat(sanitizedRows).join('\n');
+            }
+
+            // Append the new user row without the password hash
+            const newRowCols = [newUser.ID, newUser.Username, newUser.Role, newUser.FullName, newUser.Barangay, newUser.DateRegistered];
+            const newRow = '\n' + newRowCols.join(',');
+            const updatedCSV = (sanitized ? sanitized : 'ID,Username,Role,FullName,Barangay,DateRegistered') + newRow;
+
+            // Download updated CSV file (sanitized)
             const blob = new Blob([updatedCSV], { type: 'text/csv' });
             const url = window.URL.createObjectURL(blob);
-            
+
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'Users_Updated.csv';
+            a.download = 'Users_Updated_Sanitized.csv';
             a.click();
-            
+
             window.URL.revokeObjectURL(url);
-            
-            console.log('Updated Users.csv downloaded with new user:', newUser.Username);
+
+            // Log only non-sensitive event
+            console.log('Updated Users CSV (sanitized) downloaded');
         } catch (error) {
             console.error('Error updating Users.csv:', error);
         }
@@ -253,7 +271,7 @@ const auth = new AuthSystem();
 // Show login form
 function showLoginForm() {
     document.body.innerHTML = `
-        <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #ff6b6b 0%, #feca57 100%);">
+        <div style="display: flex; justify-content: center; align-items: center; min-height: 100vh;">
             <div style="background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 400px;">
                 <h2 style="text-align: center; margin-bottom: 30px; color: #333;">🇵🇭 ResourceShare PH</h2>
                 <div id="login-form">
