@@ -14,8 +14,8 @@ class CSVDatabase {
     // Load CSV data
     async loadTable(tableName) {
         try {
-            // Prefer files in the hidden .records folder if present (e.g. ./assets/.records/ShareResources.csv)
-            const recordPath = this.baseUrl + '.records/' + this.tables[tableName];
+            // Prefer files in the records folder if present (e.g. ./assets/records/ShareResources.csv)
+            const recordPath = this.baseUrl + 'records/' + this.tables[tableName];
             let response = await fetch(recordPath);
 
             if (!response.ok) {
@@ -24,7 +24,7 @@ class CSVDatabase {
             }
 
             if (!response.ok) {
-                console.error(`Failed to load ${tableName} from both .records and assets:`, response.status);
+                console.error(`Failed to load ${tableName} from both records and assets:`, response.status);
                 return [];
             }
 
